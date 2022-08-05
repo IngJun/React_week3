@@ -41,6 +41,4 @@ max-width: 1200px;
 CSS(UI/UX):
 `styled-components` 임포트!!!
 
-
-백엔드: `Firebase/firestore`
 컴포넌트 구상: Header, Content, Comment, Button, Layout
