@@ -140,14 +140,14 @@ export default function reducer(state = initialState, action = {}) {
         case DELETECOMMENT: {
             console.log('deleting comment');
             const new_post_list = state.list.map((post) => {
-                if(post.id === action.post_id) {
+                if (post.id === action.post_id) {
                     const new_comments = post.comments.filter((comment) => comment.id !== action.comment_id);
-                    return {...post, comments: new_comments};
+                    return { ...post, comments: new_comments };
                 } else {
                     return post;
                 }
-            }) 
-            return {...state, list: new_post_list};
+            })
+            return { ...state, list: new_post_list };
         }
         default: return state;
     }
