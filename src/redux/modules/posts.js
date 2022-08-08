@@ -76,7 +76,7 @@ export default function reducer(state = initialState, action = {}) {
     switch (action.type) {
         case CREATEPOST: {
             console.log('creating post');
-            const new_post = { ...action.post, comment: [] };
+            const new_post = { ...action.post, comments: [] };
             const new_post_list = [...state.list, new_post];
             return { ...state, list: new_post_list };
         }
@@ -105,7 +105,12 @@ export default function reducer(state = initialState, action = {}) {
             console.log('creating comment');
             const new_post_list = state.list.map((post) => {
                 if (post.id === action.post_id) {
-                    const new_comments = [...post.comments, action.comment];
+                    let new_comments;
+                    if (post.comments.length !== 0) {
+                        new_comments = [...post.comments, action.comment];
+                    } else {
+                        new_comments = [action.comment];
+                    }
                     return { ...post, comments: new_comments };
                 } else {
                     return post;

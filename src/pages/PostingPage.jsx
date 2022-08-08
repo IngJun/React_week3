@@ -23,7 +23,7 @@ const PostingPage = (props) => {
             {
                 id: id,
                 title: title_ref.current.value,
-                content: content_ref.current.value
+                content: content_ref.current.value,
             }));
         title_ref.current.value = '';
         content_ref.current.value = '';
