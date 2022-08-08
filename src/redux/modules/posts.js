@@ -60,9 +60,9 @@ export const readComment = (post_id, comment_id) => {
     return { type: READCOMMENT, post_id, comment_id };
 }
 
-// comment = {content: ''}
-export const updateComment = (post_id, comment_id, comment) => {
-    return { type: UPDATECOMMENT, post_id, comment_id, comment };
+// comment_content =  ''
+export const updateComment = (post_id, comment_id, comment_content) => {
+    return { type: UPDATECOMMENT, post_id, comment_id, comment_content };
 }
 
 export const deleteComment = (post_id, comment_id) => {
@@ -130,12 +130,12 @@ export default function reducer(state = initialState, action = {}) {
                 if (post.id === action.post_id) {
                     const new_comments = post.comments.map((comment) => {
                         if (comment.id === action.comment_id) {
-                            return { ...comment, content: action.content };
+                            return { ...comment, content: action.comment_content };
                         } else {
                             return comment;
                         }
                     });
-                    return { ...post, comment: new_comments };
+                    return { ...post, comments: new_comments };
                 } else {
                     return post;
                 }
