@@ -13,15 +13,21 @@ const PostPage = (props) => {
 
     const params = useParams();
     const dispatch = useDispatch();
-    dispatch(readPost(params.id));
     const navigate = useNavigate();
-    const post = useSelector(state => state.posts.currentPost);
+    let post = useSelector(state => state.posts.currentPost);
     console.log(post);
 
+    const editPost = () => {
+        console.log(title_ref.current.value, content_ref.current.value);
+        dispatch(updatePost(post.id, { title: title_ref.current.value, content: content_ref.current.value }));
+        setEdit(!edit);
+    }
 
     React.useEffect(() => {
         console.log(edit);
-    }, [edit]);
+        dispatch(readPost(params.id));
+
+    }, [edit, dispatch, params]);
 
     return (
         <div>
@@ -31,19 +37,16 @@ const PostPage = (props) => {
             {!edit
                 ?
                 <>
-                    <button onClick={()=>{setEdit(!edit)}}>게시글 수정</button>
+                    <button onClick={() => { setEdit(!edit) }}>게시글 수정</button>
                     <h1>{post.title}</h1>
-                    <p>{post.content}</p>
+                    <pre>{post.content}</pre>
                 </>
                 :
                 <>
-                    <button onClick={()=>{setEdit(!edit)}}>취소</button>
-                    <button onClick={() => {
-                        dispatch(updatePost({title: title_ref.current.value, content: content_ref.current.value}, post.id));
-                        setEdit(!edit);
-                    }}>수정</button>
-                    제목: <input ref={title_ref}/>
-                    내용: <textarea ref={content_ref}/>
+                    <button onClick={() => { setEdit(!edit) }}>취소</button>
+                    <button onClick={editPost}>수정</button>
+                    제목: <input ref={title_ref} defaultValue={post.title}></input>
+                    내용: <textarea ref={content_ref} defaultValue={post.content}></textarea>
                 </>
             }
         </div >

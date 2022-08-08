@@ -52,12 +52,12 @@ export const deletePost = (post_id) => {
 }
 
 // comment = {id: '', content: ''}
-export const createComment = (comment, post_id) => {
-    return { type: CREATECOMMENT, comment, post_id };
+export const createComment = (post_id, comment) => {
+    return { type: CREATECOMMENT, post_id, comment };
 }
 
-export const readComment = (comment_id, post_id) => {
-    return { type: READCOMMENT, comment_id, post_id };
+export const readComment = (post_id, comment_id) => {
+    return { type: READCOMMENT, post_id, comment_id };
 }
 
 // comment = {content: ''}
