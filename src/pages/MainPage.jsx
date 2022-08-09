@@ -1,8 +1,12 @@
 import React, { useEffect } from 'react';
+import styled from 'styled-components';
 import Header from '../components/header/Header';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { deletePost } from '../redux/modules/posts';
+import Button from '../components/button/Button';
+import AddIcon from '@mui/icons-material/Add';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const MainPage = (props) => {
     const data = useSelector(state => state.posts.list);
@@ -15,17 +19,16 @@ const MainPage = (props) => {
 
     return (
         <div>
-            <Header />
-            <button onClick={() => { navigate('/posting'); }}>게시글 등록</button>
+            <Header btn_text={<AddIcon/>} btn_action={()=>navigate('/posting')}/>
 
             {data.map((post) => {
                 return (
-                    <div key={post.id} >
-                        <h1 onClick={() => {
+                    <PostWrapper key={post.id} >
+                        <StyledH1 onClick={() => {
                             navigate('/post/' + post.id);
-                        }}>{post.title}</h1>
-                        <button onClick={() => { dispatch(deletePost(post.id)); }}>게시글 삭제</button>
-                    </div>
+                        }}>{post.title}</StyledH1>
+                        <Button text={<DeleteIcon/>} action={() => { dispatch(deletePost(post.id)); }}/>
+                    </PostWrapper>
                 );
             })}
         </div>
@@ -33,3 +36,19 @@ const MainPage = (props) => {
 }
 
 export default MainPage;
+
+const PostWrapper = styled.div`
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    margin: 1px 0;
+    border: 1px solid #eee;
+    border-radius: 10px;
+`;
+
+const StyledH1 = styled.h1`
+    cursor: pointer;
+`;

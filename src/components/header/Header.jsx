@@ -1,13 +1,15 @@
 import React from 'react';
 import styled from 'styled-components';
 import {useNavigate} from 'react-router-dom';
+import Button from '../button/Button';
 
-const Header = (props) => {
+const Header = ({btn_text, btn_style, btn_action}) => {
     const navigate = useNavigate();
 
     return ( 
-        <Wrapper onClick={() =>{navigate('/');}}>
-            <h1>Home</h1>
+        <Wrapper >
+            <StyledH1 onClick={() =>{navigate('/');}}>iPost</StyledH1>
+            <Button text={btn_text} action={btn_action}/>
         </Wrapper>
      );
 }
@@ -15,6 +17,7 @@ const Header = (props) => {
 export default Header;
 
 const Wrapper = styled.div`
+    box-sizing: border-box;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -22,4 +25,10 @@ const Wrapper = styled.div`
     padding: 20px;
     margin: 0;
     width: 100%;
+    background-color: #eee;
+    border-radius: 10px;
+`;
+
+const StyledH1 = styled.h1`
+    cursor: pointer;
 `;

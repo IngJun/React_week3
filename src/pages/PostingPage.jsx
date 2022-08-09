@@ -2,12 +2,17 @@ import React from 'react';
 import nextId from 'react-id-generator';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
+import styled from 'styled-components';
 import Header from '../components/header/Header';
 import { createPost } from '../redux/modules/posts';
+import Button from '../components/button/Button';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
 
 const PostingPage = (props) => {
     const id = nextId();
-    const navigate= useNavigate();
+    const navigate = useNavigate();
     const data = useSelector(state => state.posts)
     const dispatch = useDispatch();
     const title_ref = React.useRef(null);
@@ -36,13 +41,58 @@ const PostingPage = (props) => {
 
     return (
         <div>
-            <Header />
-            제목 <input type="text" ref={title_ref} />
-            내용 <textarea ref={content_ref} />
-            <button onClick={makeNewPost}>추가</button>
-            <button onClick={()=>{navigate('/')}}>취소</button>
+            <Header btn_text={<ArrowBackIcon/>} btn_action={() =>{navigate(-1);}}/>
+            <PostWrapper>
+                <div>
+                    <StyledLabel htmlFor='title-input'>제목</StyledLabel><br />
+                    <StyledInput type="text" ref={title_ref} id='title-input' />
+                </div>
+                <div>
+                    <StyledLabel htmlFor='content-input'>내용</StyledLabel><br />
+                    <StyledTextArea ref={content_ref} id='contentinput' />
+                </div>
+                <ButtonGroup>
+                    <Button text={<CheckIcon/>} action={makeNewPost}/>
+                    <Button text={<CloseIcon/>} action={() => { navigate('/') }}/>
+                </ButtonGroup>
+            </PostWrapper>
         </div>
     );
 }
 
 export default PostingPage;
+
+const PostWrapper = styled.div`
+    box-sizing: border-box;
+    padding: 20px;
+`;
+
+const StyledLabel = styled.label`
+    font-size: 20px;
+`;
+
+const StyledInput = styled.input`
+    box-sizing: border-box;
+    width: 100%;
+    padding: 30px;
+    margin: 0px;
+    border: 1 solid #eee;
+    border-radius: 10px;
+    font-size: 20px;
+`;
+
+const StyledTextArea = styled.textarea`
+    box-sizing: border-box;
+    width: 100%;
+    padding: 30px;
+    margin: 0px;
+    border: 1 solid #eee;
+    border-radius: 10px;
+    font-size: 20px;
+    resize: vertical;
+`;
+
+const ButtonGroup = styled.div`
+    text-align: right;
+`;
+

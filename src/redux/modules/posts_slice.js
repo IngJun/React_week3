@@ -42,20 +42,8 @@ export const postSlice = createSlice({
             })
         },
         deletePost: (state, action) => {
-            console.log('creating comment');
-            state.list = state.list.map((post) => {
-                if (post.id === action.post_id) {
-                    let new_comments;
-                    if (post.comments.length !== 0) {
-                        new_comments = [...post.comments, action.comment];
-                    } else {
-                        new_comments = [action.comment];
-                    }
-                    return { ...post, comments: new_comments };
-                } else {
-                    return post;
-                }
-            })
+            console.log('deleting post');
+            state.list = state.list.filter((post) => post.id !== action.post_id);
         },
         createComment: (state, action) => {
             console.log('creating comment');
