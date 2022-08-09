@@ -9,7 +9,7 @@ import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 
 const MainPage = (props) => {
-    const data = useSelector(state => state.posts.list);
+    const data = useSelector(state => state.posts.post_list);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 

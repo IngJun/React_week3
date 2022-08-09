@@ -1,7 +1,7 @@
 import React from 'react';
 import nextId from 'react-id-generator';
 import { useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import Header from '../components/header/Header';
 import { createPost } from '../redux/modules/posts';
@@ -13,7 +13,6 @@ import CheckIcon from '@mui/icons-material/Check';
 const PostingPage = (props) => {
     const id = nextId();
     const navigate = useNavigate();
-    const data = useSelector(state => state.posts)
     const dispatch = useDispatch();
     const title_ref = React.useRef(null);
     const content_ref = React.useRef(null);
@@ -34,10 +33,6 @@ const PostingPage = (props) => {
         content_ref.current.value = '';
         navigate('/');
     }
-
-    React.useEffect(() => {
-        console.log(data);
-    }, [data]);
 
     return (
         <div>

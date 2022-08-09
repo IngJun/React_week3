@@ -23,7 +23,7 @@ const PostPage = (props) => {
     const [postedit, setPostEdit] = useState(false);
 
 
-    const post = useSelector(state => state.posts.currentPost);
+    const post = useSelector(state => state.posts.current_post);
     console.log(post);
 
     const editPost = () => {

@@ -1,21 +1,21 @@
 // posts.js
 
 const initialState = {
-    list: [
+    post_list: [
         {
             id: '1',
             title: 'post example',
             content: 'content example',
-            comments: [
-                { id: '1', content: 'comments example 1' },
-                { id: '2', content: 'comments example 2' },
-                { id: '3', content: 'comments example 3' },
-                { id: '4', content: 'comments example 4' }
-            ],
         }
     ],
-    currentPost: {},
-    currentComment: {},
+    comment_list: [
+        { post_id: '1', id: '1', content: 'comments example 1' },
+        { post_id: '1', id: '2', content: 'comments example 2' },
+        { post_id: '1', id: '3', content: 'comments example 3' },
+        { post_id: '1', id: '4', content: 'comments example 4' }
+    ],
+    current_post: {},
+    current_comment: {},
 };
 
 
@@ -76,83 +76,59 @@ export default function reducer(state = initialState, action = {}) {
     switch (action.type) {
         case CREATEPOST: {
             console.log('creating post');
-            const new_post = { ...action.post, comments: [] };
-            const new_post_list = [...state.list, new_post];
-            return { ...state, list: new_post_list };
+            const new_post = { ...action.post };
+            const new_post_list = [...state.post_list, new_post];
+            return { ...state, post_list: new_post_list };
         }
         case READPOST: {
             console.log('reading post');
-            const current_post = state.list.find((post) => post.id === action.post_id);
-            return { ...state, currentPost: current_post };
+            const current_post = state.post_list.find((post) => post.id === action.post_id);
+            return { ...state, current_post: current_post };
         }
         case UPDATEPOST: {
             console.log('updating post');
-            const updated_post_list = state.list.map((post) => {
+            const updated_post_list = state.post_list.map((post) => {
                 if (post.id === action.post_id) {
                     return { ...post, title: action.post.title, content: action.post.content }
                 } else {
                     return post;
                 }
             })
-            return { ...state, list: updated_post_list };
+            return { ...state, post_list: updated_post_list };
         }
         case DELETEPOST: {
             console.log('deleting post');
-            const new_post_list = state.list.filter((post) => post.id !== action.post_id);
-            return { ...state, list: new_post_list };
+            const new_post_list = state.post_list.filter((post) => post.id !== action.post_id);
+            return { ...state, post_list: new_post_list };
         }
         case CREATECOMMENT: {
             console.log('creating comment');
-            const new_post_list = state.list.map((post) => {
-                if (post.id === action.post_id) {
-                    let new_comments;
-                    if (post.comments.length !== 0) {
-                        new_comments = [...post.comments, action.comment];
-                    } else {
-                        new_comments = [action.comment];
-                    }
-                    return { ...post, comments: new_comments };
-                } else {
-                    return post;
-                }
-            })
-            return { ...state, list: new_post_list };
+            const new_comment_list = [...state.comment_list,
+            { post_id: action.post_id, ...action.comment }]
+            return { ...state, comment_list: new_comment_list };
         }
         case READCOMMENT: {
             console.log('reading comment');
-            const current_post = state.list.find((post) => post.id === action.post_id);
-            const current_comment = current_post.comments.find((comment) => comment.id === action.comment_id);
-            return { ...state, currentComment: current_comment };
+            const current_post_comments = state.comment_list.filter((comment) => comment.post_id === action.post_id);
+            const current_comment = current_post_comments.find((comment) => comment.id === action.comment_id);
+            return { ...state, current_comment: current_comment };
         }
         case UPDATECOMMENT: {
             console.log('updating comment');
-            const new_post_list = state.list.map((post) => {
-                if (post.id === action.post_id) {
-                    const new_comments = post.comments.map((comment) => {
-                        if (comment.id === action.comment_id) {
-                            return { ...comment, content: action.comment_content };
-                        } else {
-                            return comment;
-                        }
-                    });
-                    return { ...post, comments: new_comments };
+            const new_comment_list = state.comment_list.map((comment) => {
+                if (comment.post_id === action.post_id && comment.id === action.comment_id) {
+                    return { ...comment, content: action.comment_content }
                 } else {
-                    return post;
+                    return comment;
                 }
             })
-            return { ...state, list: new_post_list };
+            return { ...state, comment_list: new_comment_list };
         }
         case DELETECOMMENT: {
             console.log('deleting comment');
-            const new_post_list = state.list.map((post) => {
-                if (post.id === action.post_id) {
-                    const new_comments = post.comments.filter((comment) => comment.id !== action.comment_id);
-                    return { ...post, comments: new_comments };
-                } else {
-                    return post;
-                }
-            })
-            return { ...state, list: new_post_list };
+            const new_comment_list = state.comment_list.filter((comment) =>
+                !(comment.id === action.comment_id && comment.post_id === action.post_id))
+            return { ...state, comment_list: new_comment_list };
         }
         default: return state;
     }
