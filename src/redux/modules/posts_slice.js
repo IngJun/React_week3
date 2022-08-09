@@ -19,7 +19,7 @@ export const postSlice = createSlice({
             { post_id: '1', id: '4', content: 'comments example 4' }
         ],
         current_post: {},
-        current_comment: {},
+        current_comments: [],
     },
     reducers: {
         createPost: (state, action) => {
@@ -50,10 +50,9 @@ export const postSlice = createSlice({
             state.comment_list = [...state.comment_list,
             { post_id: action.post_id, ...action.comment }];
         },
-        readComment: (state, action) => {
-            console.log('reading comment');
-            const current_post_comments = state.comment_list.filter((comment) => comment.post_id === action.post_id);
-            state.current_comment = current_post_comments.find((comment) => comment.id === action.comment_id);
+        readComments: (state, action) => {
+            console.log('reading comments');
+            state.current_comments = state.comment_list.filter((comment) => comment.post_id === action.post_id);
         },
         updateComment: (state, action) => {
             console.log('updating comment');
@@ -74,6 +73,6 @@ export const postSlice = createSlice({
 })
 
 export const { createPost, readPost, updatePost, deletePost,
-    createComment, readComment, updateComment, deleteComment } = postSlice.actions;
+    createComment, readComments, updateComment, deleteComment } = postSlice.actions;
 
 export default postSlice.reducer;

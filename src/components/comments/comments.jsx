@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import nextId from 'react-id-generator';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { createComment, updateComment, deleteComment, readPost } from '../../redux/modules/posts';
+import { createComment, updateComment, deleteComment, readComments } from '../../redux/modules/posts';
 import Button from '../button/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
@@ -12,10 +12,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 
 const Comments = ({ post_id }) => {
-
     const dispatch = useDispatch();
-    dispatch(readPost(post_id));
-    const post = useSelector(state => state.posts.currentPost);
+
+    const comments = useSelector(state => state.posts.current_comments);
 
     const new_comment_id = nextId();
     const comment_ref = useRef(null);
@@ -26,7 +25,7 @@ const Comments = ({ post_id }) => {
     const [comment_id, setCommentId] = useState(null);
 
     useEffect(() => {
-        dispatch(readPost(post_id));
+        dispatch(readComments(post_id));
     }, [cmtcreate, dispatch, post_id]);
 
     return (
@@ -48,14 +47,14 @@ const Comments = ({ post_id }) => {
             <hr />
 
             {/* display comments */}
-            {post.comments?.map((comment) => {
+            {comments?.map((comment) => {
 
                 if (comment_id === comment.id && cmtupdate) {
                     return (
                         <CommentWrapper key={comment.id}>
 
                             <StyledInput ref={edit_ref} type="text" defaultValue={comment.content} />
-                            <div>
+                            <ButtonGroup>
                                 <Button text={<CloseIcon/>} action={() => {
                                     setUpdate(!cmtupdate);
                                 }} />
@@ -67,8 +66,9 @@ const Comments = ({ post_id }) => {
                                     setUpdate(!cmtupdate);
                                     console.log(edit_ref.current.value);
                                     dispatch(updateComment(post_id, comment.id, edit_ref.current.value));
+                                    dispatch(readComments(post_id));
                                 }} />
-                            </div>
+                            </ButtonGroup>
                         </CommentWrapper>
                     )
                 }
@@ -78,7 +78,7 @@ const Comments = ({ post_id }) => {
                             <p>
                                 {comment.content}
                             </p>
-                            <div>
+                            <ButtonGroup>
                                 <Button text={<EditIcon />} action={() => {
                                     setUpdate(!cmtupdate);
                                     setCommentId(comment.id);
@@ -86,8 +86,9 @@ const Comments = ({ post_id }) => {
                                 <Button text={<DeleteIcon />} action={() => {
                                     setDelete(!cmtdelete);
                                     dispatch(deleteComment(post_id, comment.id));
+                                    dispatch(readComments(post_id));
                                 }} />
-                            </div>
+                            </ButtonGroup>
                         </CommentWrapper>
                     )
                 }
@@ -105,7 +106,7 @@ const CommentSectionWrapper = styled.div`
 
 const StyledInput = styled.input`
     box-sizing: border-box;
-    width: 90%;
+    width: 80%;
     padding: 5px;
     margin: 0px;
     border: 1 solid #eee;
@@ -125,4 +126,8 @@ const CommentWrapper = styled.div`
         height: 20px;
         padding: 0;
     }
+`;
+
+const ButtonGroup = styled.div`
+    text-align: right;
 `;

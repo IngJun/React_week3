@@ -15,7 +15,7 @@ const initialState = {
         { post_id: '1', id: '4', content: 'comments example 4' }
     ],
     current_post: {},
-    current_comment: {},
+    current_comments: [],
 };
 
 
@@ -26,7 +26,7 @@ const UPDATEPOST = 'posts/updatePost';
 const DELETEPOST = 'posts/deletePost';
 
 const CREATECOMMENT = 'posts/createComment';
-const READCOMMENT = 'posts/readComment';
+const READCOMMENTS = 'posts/readComments';
 const UPDATECOMMENT = 'posts/updateComment';
 const DELETECOMMENT = 'posts/deleteComment';
 
@@ -56,8 +56,8 @@ export const createComment = (post_id, comment) => {
     return { type: CREATECOMMENT, post_id, comment };
 }
 
-export const readComment = (post_id, comment_id) => {
-    return { type: READCOMMENT, post_id, comment_id };
+export const readComments = (post_id) => {
+    return { type: READCOMMENTS, post_id};
 }
 
 // comment_content =  ''
@@ -107,11 +107,10 @@ export default function reducer(state = initialState, action = {}) {
             { post_id: action.post_id, ...action.comment }]
             return { ...state, comment_list: new_comment_list };
         }
-        case READCOMMENT: {
-            console.log('reading comment');
-            const current_post_comments = state.comment_list.filter((comment) => comment.post_id === action.post_id);
-            const current_comment = current_post_comments.find((comment) => comment.id === action.comment_id);
-            return { ...state, current_comment: current_comment };
+        case READCOMMENTS: {
+            console.log('reading comments');
+            const current_comments = state.comment_list.filter((comment) => comment.post_id === action.post_id);
+            return { ...state, current_comments: [...current_comments] };
         }
         case UPDATECOMMENT: {
             console.log('updating comment');
