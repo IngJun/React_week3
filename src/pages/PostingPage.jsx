@@ -1,17 +1,15 @@
 import React from 'react';
-import nextId from 'react-id-generator';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import styled from 'styled-components';
 import Header from '../components/header/Header';
-import { createPost } from '../redux/modules/posts';
+import { createPostFB } from '../redux/modules/posts';
 import Button from '../components/button/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 
 const PostingPage = (props) => {
-    const id = nextId();
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const title_ref = React.useRef(null);
@@ -23,12 +21,7 @@ const PostingPage = (props) => {
             window.alert('The content is too short or title is missing');
             return;
         }
-        dispatch(createPost(
-            {
-                id: id,
-                title: title_ref.current.value,
-                content: content_ref.current.value,
-            }));
+        dispatch(createPostFB({title: title_ref.current.value, content: content_ref.current.value}))
         title_ref.current.value = '';
         content_ref.current.value = '';
         navigate('/');
@@ -36,7 +29,7 @@ const PostingPage = (props) => {
 
     return (
         <div>
-            <Header btn_text={<ArrowBackIcon/>} btn_action={() =>{navigate(-1);}}/>
+            <Header btn_text={<ArrowBackIcon />} btn_action={() => { navigate(-1); }} />
             <PostWrapper>
                 <div>
                     <StyledLabel htmlFor='title-input'>제목</StyledLabel><br />
@@ -44,11 +37,11 @@ const PostingPage = (props) => {
                 </div>
                 <div>
                     <StyledLabel htmlFor='content-input'>내용</StyledLabel><br />
-                    <StyledTextArea ref={content_ref} id='contentinput' />
+                    <StyledTextArea ref={content_ref} id='content-input' />
                 </div>
                 <ButtonGroup>
-                    <Button text={<CheckIcon/>} action={makeNewPost}/>
-                    <Button text={<CloseIcon/>} action={() => { navigate('/') }}/>
+                    <Button text={<CheckIcon />} action={makeNewPost} />
+                    <Button text={<CloseIcon />} action={() => { navigate('/') }} />
                 </ButtonGroup>
             </PostWrapper>
         </div>

@@ -1,9 +1,8 @@
 // Comment section
-import React, { useState, useEffect, useRef } from 'react';
-import nextId from 'react-id-generator';
+import React, { useState, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import styled from 'styled-components';
-import { createComment, updateComment, deleteComment, readComments } from '../../redux/modules/posts';
+import { readComments, createCommentFB, updateCommentFB, deleteCommentFB } from '../../redux/modules/posts';
 import Button from '../button/Button';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
@@ -13,10 +12,8 @@ import RateReviewIcon from '@mui/icons-material/RateReview';
 
 const Comments = ({ post_id }) => {
     const dispatch = useDispatch();
+    const comments = useSelector(state => state.posts.comment_list);
 
-    const comments = useSelector(state => state.posts.current_comments);
-
-    const new_comment_id = nextId();
     const comment_ref = useRef(null);
     const edit_ref = useRef(null);
     const [cmtcreate, setCreate] = useState(false);
@@ -24,9 +21,6 @@ const Comments = ({ post_id }) => {
     const [cmtupdate, setUpdate] = useState(false);
     const [comment_id, setCommentId] = useState(null);
 
-    useEffect(() => {
-        dispatch(readComments(post_id));
-    }, [cmtcreate, dispatch, post_id]);
 
     return (
         <CommentSectionWrapper>
@@ -34,12 +28,12 @@ const Comments = ({ post_id }) => {
             <CommentWrapper>
                 <StyledInput type='text' ref={comment_ref} placeholder='Leave a comment' />
                 <Button text={<RateReviewIcon />} action={() => {
-                    if(!/\S/.test(comment_ref.current.value)) {
+                    if (!/\S/.test(comment_ref.current.value)) {
                         window.alert('Comment is empty!');
                         return;
                     }
                     setCreate(!cmtcreate);
-                    dispatch(createComment(post_id, { id: new_comment_id, content: comment_ref.current.value }))
+                    dispatch(createCommentFB({ post_id: post_id, content: comment_ref.current.value }));
                     comment_ref.current.value = '';
                 }} />
             </CommentWrapper>
@@ -48,24 +42,26 @@ const Comments = ({ post_id }) => {
 
             {/* display comments */}
             {comments?.map((comment) => {
-
+                if(comment.post_id !== post_id) {
+                    return null;
+                }
                 if (comment_id === comment.id && cmtupdate) {
                     return (
                         <CommentWrapper key={comment.id}>
 
                             <StyledInput ref={edit_ref} type="text" defaultValue={comment.content} />
                             <ButtonGroup>
-                                <Button text={<CloseIcon/>} action={() => {
+                                <Button text={<CloseIcon />} action={() => {
                                     setUpdate(!cmtupdate);
                                 }} />
-                                <Button text={<CheckIcon/>} action={() => {
-                                    if(!/\S/.test(edit_ref.current.value)) {
+                                <Button text={<CheckIcon />} action={() => {
+                                    if (!/\S/.test(edit_ref.current.value)) {
                                         window.alert('Comment is empty!');
                                         return;
                                     }
                                     setUpdate(!cmtupdate);
                                     console.log(edit_ref.current.value);
-                                    dispatch(updateComment(post_id, comment.id, edit_ref.current.value));
+                                    dispatch(updateCommentFB(comment.id, edit_ref.current.value));
                                     dispatch(readComments(post_id));
                                 }} />
                             </ButtonGroup>
@@ -85,7 +81,7 @@ const Comments = ({ post_id }) => {
                                 }} />
                                 <Button text={<DeleteIcon />} action={() => {
                                     setDelete(!cmtdelete);
-                                    dispatch(deleteComment(post_id, comment.id));
+                                    dispatch(deleteCommentFB(comment.id));
                                     dispatch(readComments(post_id));
                                 }} />
                             </ButtonGroup>

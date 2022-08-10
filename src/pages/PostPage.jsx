@@ -1,9 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Header from '../components/header/Header';
-import { readPost, updatePost } from '../redux/modules/posts';
+import { loadPostsFB, updatePostFB } from '../redux/modules/posts';
 import Comments from '../components/comments/Comments';
 import Button from '../components/button/Button';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -11,35 +11,33 @@ import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import CheckIcon from '@mui/icons-material/Check';
 
-const PostPage = (props) => {
+const PostPage = () => {
 
     const params = useParams();
     const dispatch = useDispatch();
+    
     const navigate = useNavigate();
     const title_ref = useRef(null);
     const content_ref = useRef(null);
 
-
     const [postedit, setPostEdit] = useState(false);
 
+    const posts = useSelector(state => state.posts.post_list);
+    console.log(posts);
+    const current_post = posts.find(post => post.id === params.id);
 
-    const post = useSelector(state => state.posts.current_post);
-    console.log(post);
+    useEffect(() =>{
+        dispatch(loadPostsFB());
+    }, [dispatch]);
 
     const editPost = () => {
         if(!/\S/.test(title_ref.current.value) || !/\S/.test(content_ref.current.value)) {
             window.alert('Title or Content is empty!');
             return;
         }
-        dispatch(updatePost(post.id, { title: title_ref.current.value, content: content_ref.current.value }));
+        dispatch(updatePostFB(params.id, { title: title_ref.current.value, content: content_ref.current.value }));
         setPostEdit(!postedit);
     }
-
-    React.useEffect(() => {
-        console.log(postedit);
-        dispatch(readPost(params.id));
-
-    }, [postedit, params, dispatch]);
 
     return (
         <div>
@@ -52,8 +50,8 @@ const PostPage = (props) => {
                         <ButtonGroup>
                             <Button text={<EditIcon />} action={() => { setPostEdit(!postedit) }} />
                         </ButtonGroup>
-                        <h1>{post.title}</h1>
-                        <StyledPre>{post.content}</StyledPre>
+                        <h1>{current_post.title}</h1>
+                        <StyledPre>{current_post.content}</StyledPre>
                     </PostWrapper>
                 </>
                 :
@@ -66,10 +64,10 @@ const PostPage = (props) => {
                         <div>
                             <StyledLabel htmlFor='title-input'>제목</StyledLabel><br />
                         </div>
-                        <StyledInput ref={title_ref} defaultValue={post.title} id='title-input' />
+                        <StyledInput ref={title_ref} defaultValue={current_post.title} id='title-input' />
                         <div>
                             <StyledLabel htmlFor='content-input'>내용</StyledLabel><br />
-                            <StyledTextArea ref={content_ref} defaultValue={post.content} id='content-input' />
+                            <StyledTextArea ref={content_ref} defaultValue={current_post.content} id='content-input' />
                         </div>
                     </PostWrapper>
                 </>

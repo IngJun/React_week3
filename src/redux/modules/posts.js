@@ -1,4 +1,6 @@
 // posts.js
+import { db } from '../../firebase/firebase';
+import { collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 
 const initialState = {
     post_list: [
@@ -20,11 +22,13 @@ const initialState = {
 
 
 // action types
+const LOADPOSTS = 'posts/loadPosts';
 const CREATEPOST = 'posts/createPost';
 const READPOST = 'posts/readPost';
 const UPDATEPOST = 'posts/updatePost';
 const DELETEPOST = 'posts/deletePost';
 
+const LOADCOMMENTS = 'comments/loadComments';
 const CREATECOMMENT = 'posts/createComment';
 const READCOMMENTS = 'posts/readComments';
 const UPDATECOMMENT = 'posts/updateComment';
@@ -32,6 +36,11 @@ const DELETECOMMENT = 'posts/deleteComment';
 
 
 // action creators
+
+// posts = [{}, {}, {}, ...]
+export const loadPosts = (posts) => {
+    return { type: LOADPOSTS, posts };
+}
 
 // post = {id='', title: '', content: ''}
 export const createPost = (post) => {
@@ -51,22 +60,142 @@ export const deletePost = (post_id) => {
     return { type: DELETEPOST, post_id };
 }
 
-// comment = {id: '', content: ''}
-export const createComment = (post_id, comment) => {
-    return { type: CREATECOMMENT, post_id, comment };
+// comments = [{}, {}, {}, ...]
+export const loadComments = (comments) => {
+    return { type: LOADCOMMENTS, comments };
+};
+
+// comment = {post_id: '', content: ''}
+export const createComment = (comment_id, comment) => {
+    return { type: CREATECOMMENT, comment_id, comment };
 }
 
 export const readComments = (post_id) => {
-    return { type: READCOMMENTS, post_id};
+    return { type: READCOMMENTS, post_id };
 }
 
 // comment_content =  ''
-export const updateComment = (post_id, comment_id, comment_content) => {
-    return { type: UPDATECOMMENT, post_id, comment_id, comment_content };
+export const updateComment = (comment_id, comment_content) => {
+    return { type: UPDATECOMMENT, comment_id, comment_content };
 }
 
-export const deleteComment = (post_id, comment_id) => {
-    return { type: DELETECOMMENT, post_id, comment_id };
+export const deleteComment = (comment_id) => {
+    return { type: DELETECOMMENT, comment_id };
+}
+
+//middleware actions
+export const loadPostsFB = () => {
+    console.log('loading data from firestore');
+    return async function (dispatch) {
+
+        const post_data = await getDocs(collection(db, 'post_list'));
+        const post_list = [];
+
+        post_data.forEach((doc) => {
+            post_list.push({ id: doc.id, ...doc.data() });
+        });
+
+        dispatch(loadPosts(post_list));
+        console.log('loaded data from firestore');
+    };
+}
+
+// post = {title: '', content: ''}
+export const createPostFB = (post) => {
+    return async function (dispatch) {
+        console.log('creating data to firestore...');
+
+        const docRef = await addDoc(collection(db, 'post_list'), post);
+        const _post = await getDoc(docRef);
+        const post_data = {id: _post.id, ..._post.data()};
+
+        console.log('creating data to firestore...');
+
+        dispatch(createPost(post_data));
+    }
+}
+
+// post = {title: '', cotent: ''}
+export const updatePostFB = (post_id, post) => {
+    return async function (dispatch) {
+        console.log('updating data to firestore...');
+
+        const docRef = await doc(collection(db, 'post_list'), post_id);
+        await updateDoc(docRef, {...post});
+
+        console.log('updated data to firestore');
+
+        dispatch(updatePost(post_id, post));
+        dispatch(readPost(post_id));
+    }
+}
+
+export const deletePostFB = (post_id) => {
+    return async function (dispatch) {
+        console.log('deleting post from firebase');
+
+        const docRef = await doc(collection(db, 'post_list'), post_id);
+        await deleteDoc(docRef);
+
+        console.log('deleted post from firebase');
+
+        dispatch(deletePost(post_id));
+    }
+}
+
+export const loadCommentsFB = () => {
+    return async function (dispatch) {
+        console.log('loading comments from firestore');
+
+        const comment_data = await getDocs(collection(db, 'comment_list'));
+        const comment_list = [];
+
+        comment_data.forEach((doc) => {
+            comment_list.push({ id: doc.id, ...doc.data() });
+        });
+
+        console.log('loaded comments from firestore');
+
+        dispatch(loadComments(comment_list));
+    };
+}
+
+// comment = {post_id: '', content: ''}
+export const createCommentFB = (comment) => {
+    return async function (dispatch) {
+        console.log('creating comments to firestore');
+
+        const docRef = await addDoc(collection(db, 'comment_list'), comment);
+        const _comment = await getDoc(docRef);
+
+        console.log('created comments to firestore');
+
+        dispatch(createComment(_comment.id, _comment.data()));
+    }
+}
+
+// comment_content =  ''
+export const updateCommentFB = (comment_id, comment_content) => {
+    return async function (dispatch) {
+        console.log('updating comment in firestore');
+
+        const docRef = await doc(collection(db, 'comment_list'), comment_id);
+        await updateDoc(docRef, { content: comment_content });
+
+        console.log('updated comment in firestore');
+
+        dispatch(updateComment(comment_id, comment_content));
+    }
+}
+
+export const deleteCommentFB = (comment_id) => {
+    return async function (dispatch) {
+
+        const docRef = await doc(collection(db, 'comment_list'), comment_id);
+        await deleteDoc(docRef);
+
+        dispatch(deleteComment(comment_id));
+    }
 }
 
 
@@ -74,6 +203,11 @@ export const deleteComment = (post_id, comment_id) => {
 
 export default function reducer(state = initialState, action = {}) {
     switch (action.type) {
+
+        case LOADPOSTS: {
+            console.log('loading posts');
+            return { ...state, post_list: action.posts };
+        }
         case CREATEPOST: {
             console.log('creating post');
             const new_post = { ...action.post };
@@ -101,10 +235,15 @@ export default function reducer(state = initialState, action = {}) {
             const new_post_list = state.post_list.filter((post) => post.id !== action.post_id);
             return { ...state, post_list: new_post_list };
         }
+
+        case LOADCOMMENTS: {
+            console.log('loading comments');
+            return { ...state, comment_list: action.comments };
+        }
         case CREATECOMMENT: {
             console.log('creating comment');
             const new_comment_list = [...state.comment_list,
-            { post_id: action.post_id, ...action.comment }]
+            { id: action.comment_id, ...action.comment }]
             return { ...state, comment_list: new_comment_list };
         }
         case READCOMMENTS: {
@@ -115,7 +254,7 @@ export default function reducer(state = initialState, action = {}) {
         case UPDATECOMMENT: {
             console.log('updating comment');
             const new_comment_list = state.comment_list.map((comment) => {
-                if (comment.post_id === action.post_id && comment.id === action.comment_id) {
+                if (comment.id === action.comment_id) {
                     return { ...comment, content: action.comment_content }
                 } else {
                     return comment;
@@ -125,8 +264,7 @@ export default function reducer(state = initialState, action = {}) {
         }
         case DELETECOMMENT: {
             console.log('deleting comment');
-            const new_comment_list = state.comment_list.filter((comment) =>
-                !(comment.id === action.comment_id && comment.post_id === action.post_id))
+            const new_comment_list = state.comment_list.filter((comment) => comment.id !== action.comment_id)
             return { ...state, comment_list: new_comment_list };
         }
         default: return state;
