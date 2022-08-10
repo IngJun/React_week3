@@ -7,19 +7,31 @@ import { deletePost } from '../redux/modules/posts';
 import Button from '../components/button/Button';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { db } from '../firebase/firebase';
+import {collection, doc, getDoc, getDocs, addDoc, updateDoc, deleteDoc} from 'firebase/firestore';
 
 const MainPage = (props) => {
     const data = useSelector(state => state.posts.post_list);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    useEffect(()=>{
+    const firebaseTest = async() => {
+        const docRef = await getDocs(collection(db, 'post_list'));
+        docRef.forEach((doc)=> {
+            console.log(`${doc.id} => ${doc.data()}`);
+        })
+
+    }
+
+    firebaseTest();
+
+    useEffect(() => {
         console.log(data);
     }, [data]);
 
     return (
         <div>
-            <Header btn_text={<AddIcon/>} btn_action={()=>navigate('/posting')}/>
+            <Header btn_text={<AddIcon />} btn_action={() => navigate('/posting')} />
 
             {data.map((post) => {
                 return (
@@ -27,7 +39,7 @@ const MainPage = (props) => {
                         <StyledH1 onClick={() => {
                             navigate('/post/' + post.id);
                         }}>{post.title}</StyledH1>
-                        <Button text={<DeleteIcon/>} action={() => { dispatch(deletePost(post.id)); }}/>
+                        <Button text={<DeleteIcon />} action={() => { dispatch(deletePost(post.id)); }} />
                     </PostWrapper>
                 );
             })}
