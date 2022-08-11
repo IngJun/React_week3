@@ -10,7 +10,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 const MainPage = (props) => {
     const data = useSelector(state => state.posts.post_list);
-    console.log(data);
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
