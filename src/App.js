@@ -6,6 +6,7 @@ import PostPage from './pages/PostPage';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { loadCommentsFB, loadPostsFB } from './redux/modules/posts';
+import NotFound from './pages/NotFound';
 
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path='/' element={<MainPage />} />
         <Route path='/posting' element={<PostingPage />} />
         <Route path='/post/:id' element={<PostPage />} />
+        <Route path='*' element={<NotFound/>}/>
       </Routes>
     </div>
   );
